@@ -4,7 +4,8 @@
  */
 
 var express = require('express')
-  , routes = require('./routes');
+  , routes = require('./routes')
+  , database = require('./db');
 
 var app = module.exports = express.createServer();
 
@@ -31,5 +32,34 @@ app.configure('production', function(){
 
 app.get('/', routes.index);
 
-app.listen(3000);
-console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+app.get('/descriptions', function (req, res) {
+	res.send("Gimme some descriptions");
+});
+
+//TODO replace stake
+app.get('/questions/:description', function (req, res) {
+	//var input = req.params.description;
+	var input;
+	database.find('inputs', {}, 100, function(err, data) {
+		if(err) {
+			console.log(err);
+			res.send(err);
+		}
+		else {
+			input = data;
+			//console.log('smurf');
+			res.json(data);
+		}
+	});
+	//	input = data;
+	//	res.send(data)} );
+	//res.send(input);
+});
+
+database.open(function(err) {
+	if(err) throw err;
+	app.listen(3000);
+	console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+})
+// app.listen(3000);
+// console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
