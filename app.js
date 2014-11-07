@@ -5,7 +5,9 @@
 
 var express = require('express')
   , routes = require('./routes')
-  , database = require('./db');
+  , database = require('./db')
+  , _ = require('underscore');
+  
 
 var app = module.exports = express.createServer();
 
@@ -38,22 +40,125 @@ app.get('/descriptions', function (req, res) {
 
 //TODO replace stake
 app.get('/questions/:description', function (req, res) {
-	//var input = req.params.description;
-	var input;
-	database.find('inputs', {}, 100, function(err, data) {
+
+	var input = req.params.description;
+
+	database.questions(input, function(err, data) {
 		if(err) {
 			console.log(err);
 			res.send(err);
 		}
 		else {
-			input = data;
-			//console.log('smurf');
-			res.json(data);
+			if(data != null && data.length > 0) {
+				input = data;
+				var test = req.params.description;
+				res.json(data);		
+			}
+			else {
+				res.send('No data returned from questions');
+			}
 		}
 	});
-	//	input = data;
-	//	res.send(data)} );
-	//res.send(input);
+
+
+});
+
+app.get('/doctors/:city', function (req, res) {
+
+	var input = req.params.city;
+
+	database.doctors(input, function(err, data) {
+		if(err) {
+			console.log(err);
+			res.send(err);
+		}
+		else {
+			if(data != null && data.length > 0) {
+				input = data;
+				var test = req.params.description;
+				res.json(data);		
+			}
+			else {
+				res.send('No data returned from doctors');
+			}
+		}
+	});
+
+
+});
+
+app.get('/hospitals/:city', function (req, res) {
+
+	var input = req.params.city;
+
+	database.hospitals(input, function(err, data) {
+		if(err) {
+			console.log(err);
+			res.send(err);
+		}
+		else {
+			if(data != null && data.length > 0) {
+				input = data;
+				var test = req.params.description;
+				res.json(data);		
+			}
+			else {
+				res.send('No data returned from hospitals');
+			}
+		}
+	});
+
+
+});
+
+//TODO: Use this to replace the JSON Hack
+app.get('/costs/:drg', function (req, res) {
+
+	var input = req.params.drg;
+
+	database.costs(input, function(err, data) {
+		if(err) {
+			console.log(err);
+			res.send(err);
+		}
+		else {
+			if(data != null && data.length > 0) {
+				input = data;
+				var test = req.params.description;
+				res.json(data);		
+			}
+			else {
+				res.send('No data returned from costs');
+			}
+		}
+	});
+
+
+});
+
+//get the list of choices by selcting descriptions from input collection
+app.get('/choices', function (req, res) {
+	
+	var data_returned;
+	
+		database.choices(function(err, data_returned) {
+		if(err) {
+			console.log(err);
+			res.send(err);
+		}
+		else {
+			if(data_returned != null && data_returned.length > 0) {
+				console.log(data_returned);
+				res.send(data_returned);		
+			}
+			else {
+				res.send('No data returned for choices');
+				console.log(data_returned);
+			}
+		}
+	});
+
+
 });
 
 database.open(function(err) {
@@ -61,5 +166,5 @@ database.open(function(err) {
 	app.listen(3000);
 	console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 })
-// app.listen(3000);
-// console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+
+//Why so crashy?
